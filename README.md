@@ -1,4 +1,4 @@
-# Feedly client for emacs
+# Feedly client for Emacs
 
 It's an Emacs client for your Feedly account. You can read your feeds and the read-state is synchronized back to the Feedly server.
 
