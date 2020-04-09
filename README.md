@@ -25,7 +25,7 @@ Key     |    Action
 `cursor right`   | expand current feed
 `cursor left`  | collapse current feed
 `return`  | show preview of selected feed item (press again to open it in your browser)
-`a`  | mark current feed read
+`a`  | mark all items in the current feed as read
 `g`  | fetch new items from the server
 `q`  | quit the Feedly buffer and restore window configuration
 
