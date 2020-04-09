@@ -10,7 +10,7 @@ In order to read your own feeds you need a developer API token for authorization
     
 If you use an incorrect token then **the secure connection will ask for a username/password which shouldn't happen.**
 
-If you set the token then the you fetch your feeds with
+If you set the token then you can fetch your feeds with
 
     M-x feedly
 
