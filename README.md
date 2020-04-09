@@ -8,7 +8,7 @@ In order to read your own feeds you need a developer API token for authorization
 
     (setq feedly-access-token "your token")
     
-If you use an incorrect token then **the secure connection will ask for a username/password which shouldn't happen.**
+If you use an incorrect token then **the secure connection will ask for a username/password which shouldn't happen**, so if it happens then check your token again.
 
 If you set the token then you can fetch your feeds with
 
