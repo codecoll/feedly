@@ -33,4 +33,4 @@ Key     |    Action
 
 ## Screenshot
 
-
+![screenshot](https://raw.githubusercontent.com/codecoll/feedly/master/screenshot.PNG)
