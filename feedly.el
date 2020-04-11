@@ -72,6 +72,7 @@
 (setq feedly-previous-window-configuration nil)
 
 
+(require 'json)
 (require 'shr)
 
 
