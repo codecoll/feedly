@@ -339,6 +339,7 @@
               (erase-buffer)
               (setq cursor-type nil)
               (insert (or (assoc-default 'content (assoc-default 'content item))
+                          (assoc-default 'content (assoc-default 'summary item))
                           "no description")
                       (let ((url (or (assoc-default 'canonicalUrl item)
                                      (let ((alt (assoc-default 'alternate item)))
