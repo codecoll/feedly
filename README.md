@@ -27,6 +27,7 @@ Key     |    Action
 `return`  | show preview of selected feed item (press again to open it in your browser)
 `a`  | mark all items in the current feed as read
 `g`  | fetch new items from the server
+`w`  | close item preview window and show only the item list
 `q`  | quit the Feedly buffer and restore window configuration
 
 
