@@ -425,42 +425,45 @@
 
 (defun feedly-mark-feed-as-read ()
   (interactive)
-  (let ((feed-id (assoc-default
-                  'streamId
-                  (assoc-default
-                   'origin
-                   (get-text-property
-                    (line-beginning-position)
-                    'feedly-item)))))
-    (if feed-id
-        (feedly-network-request
-         "markers"
+  (let (items)
+    (with-current-buffer feedly-buffer
+      (save-excursion
+        (goto-char (feedly-get-current-feed-position))
 
-         (lambda ()
-           (with-current-buffer feedly-buffer
-             (save-excursion
-               (goto-char (feedly-get-current-feed-position))
+        (forward-line 1)
+        (let (item)
+          (while (setq item (get-text-property (line-beginning-position)
+                                               'feedly-item))
+            (push (assoc-default 'id item) items)
+            (forward-line 1)))))
 
-               (let ((inhibit-read-only t))
-                 (re-search-forward "([0-9]+)$")
-                 (replace-match
-                  (propertize "(0)"
-                              'face 'feedly-feed-face))
+    (feedly-network-request
+     "markers"
 
-                 (forward-line 1)
-                 (let (item)
-                   (while (setq item (get-text-property (line-beginning-position)
-                                                        'feedly-item))
-                     (feedly-set-item-to-read item)
-                     (forward-line 1))))))
-           
-           (message "Done."))
-         
-         `(("action" . "markAsRead")
-           ("type" . "feeds")
-           ("feedIds". ,(vector feed-id))))
+     (lambda ()
+       ;; if no error then mark items visually as read
+       (with-current-buffer feedly-buffer
+         (save-excursion
+           (goto-char (feedly-get-current-feed-position))
 
-      (message "Do this when the selection is on a feed item in an expanded feed to avoid accidentally marking a feed read."))))
+           (let ((inhibit-read-only t))
+             (re-search-forward "([0-9]+)$")
+             (replace-match
+              (propertize "(0)"
+                          'face 'feedly-feed-face))
+
+             (forward-line 1)
+             (let (item)
+               (while (setq item (get-text-property (line-beginning-position)
+                                                    'feedly-item))
+                 (feedly-set-item-to-read item)
+                 (forward-line 1))))))
+       
+       (message "Done."))
+     
+     `(("action" . "markAsRead")
+       ("type" . "entries")
+       ("entryIds". ,(vconcat items))))))
 
 
 (defun feedly-restore-window-configuration ()
