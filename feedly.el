@@ -369,7 +369,8 @@
                   (point))
                 (line-end-position)
                 (current-buffer))
-  (setq feedly-last-selection-position (line-beginning-position)))
+  (setq feedly-last-selection-position (line-beginning-position))
+  (delete-other-windows))
 
 
 (defun feedly-select-next-item ()
