@@ -123,8 +123,6 @@
   (print continuation)
   (unless continuation
     (setq feedly-new-items nil))
-  (if (> (length feedly-new-items) 1000)
-      (error "end"))
   (feedly-network-request
    (format "streams/contents?streamId=user/%s/category/global.all&unreadOnly=true&count=1000%s"
            feedly-user-id
