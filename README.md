@@ -28,6 +28,7 @@ Key     |    Action
 `a`  | mark all items in the current feed as read
 `g`  | fetch new items from the server
 `w`  | close item preview window and show only the item list
+`s`  | mark all items in the current feed as read and then quit
 `q`  | quit the Feedly buffer and restore window configuration
 
 
