@@ -41,6 +41,7 @@
                    (define-key map (kbd "g") 'feedly)
                    (define-key map (kbd "q") 'feedly-restore-window-configuration)
                    (define-key map (kbd "w") 'feedly-close-item-preview-window)
+                   (define-key map (kbd "s") 'feedly-mark-feed-as-read-and-quit)
                    (suppress-keymap map)
                    map))
 
@@ -474,6 +475,12 @@
 (defun feedly-close-item-preview-window ()
   (interactive)
   (delete-other-windows))
+
+
+(defun feedly-mark-feed-as-read-and-quit ()
+  (interactive)
+  (feedly-mark-feed-as-read)
+  (feedly-restore-window-configuration))
 
 
 (provide 'feedly)
