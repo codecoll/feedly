@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t -*-
 
 (defface feedly-feed-face
   '((t :inherit variable-pitch
@@ -435,7 +436,7 @@
         (let (item)
           (while (setq item (get-text-property (line-beginning-position)
                                                'feedly-item))
-            (push (assoc-default 'id item) items)
+            (push item items)
             (forward-line 1)))))
 
     (feedly-network-request
@@ -444,27 +445,18 @@
      (lambda ()
        ;; if no error then mark items visually as read
        (with-current-buffer feedly-buffer
-         (save-excursion
-           (goto-char (feedly-get-current-feed-position))
-
-           (let ((inhibit-read-only t))
-             (re-search-forward "([0-9]+)$")
-             (replace-match
-              (propertize "(0)"
-                          'face 'feedly-feed-face))
-
-             (forward-line 1)
-             (let (item)
-               (while (setq item (get-text-property (line-beginning-position)
-                                                    'feedly-item))
-                 (feedly-set-item-to-read item)
-                 (forward-line 1))))))
+         (let ((inhibit-read-only t))
+           (dolist (item items)
+             (feedly-set-item-to-read item))))
        
        (message "Done."))
      
      `(("action" . "markAsRead")
        ("type" . "entries")
-       ("entryIds". ,(vconcat items))))))
+       ("entryIds". ,(vconcat (mapcar
+                               (lambda (item)
+                                 (assoc-default 'id item))
+                               items)))))))
 
 
 (defun feedly-restore-window-configuration ()
