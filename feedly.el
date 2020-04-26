@@ -52,6 +52,9 @@
 
 (defvar feedly-line-height 1.4)
 
+(defvar feedly-custom-feed-names nil
+  "Custom name for feeds in the form of an ALIST: '((current_name . new_name) ..)")
+
 
 
 ;; internal from here
@@ -184,7 +187,8 @@
                    (message "Processing %s..." key)
                    (insert "   "
                            (propertize
-                            (concat key
+                            (concat (or (assoc-default key feedly-custom-feed-names)
+                                        key)
                                     " ("
                                     (number-to-string (length items))
                                     ")")
