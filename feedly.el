@@ -46,6 +46,12 @@
                    (suppress-keymap map)
                    map))
 
+(setq feedly-summary-map (let ((map (make-sparse-keymap)))
+                           (suppress-keymap map)
+                           (define-key map (kbd "q") 'delete-window)
+                           map))
+
+
 (defvar feedly-access-token nil)
 
 (defvar feedly-buffer "*feedly*")
@@ -98,34 +104,45 @@
      (lambda (status handler post)
        (if (plist-get status :error)
            (progn
-             (search-forward "\n\n")
+             (search-forward "\n\n" nil t)
              (error (assoc-default 'errorMessage (json-read))))
 
-         (goto-char (point-min))
-         (re-search-forward "X-Ratelimit-Count: \\(.+\\)")
-         (setq feedly-api-usage-count (match-string 1))
-         
-         (goto-char (point-min))
-         (re-search-forward "X-RateLimit-Limit: \\(.+\\)")
-         (setq feedly-api-usage-limit (match-string 1))
+         (condition-case err
+             (progn
+               (goto-char (point-min))
+               (re-search-forward "X-Ratelimit-Count: \\(.+\\)")
+               (setq feedly-api-usage-count (match-string 1))
+               
+               (goto-char (point-min))
+               (re-search-forward "X-RateLimit-Limit: \\(.+\\)")
+               (setq feedly-api-usage-limit (match-string 1))
 
-         (goto-char (point-min))
-         (re-search-forward "X-Ratelimit-Reset: \\(.+\\)")
-         (setq feedly-api-usage-reset (match-string 1))
+               (goto-char (point-min))
+               (re-search-forward "X-Ratelimit-Reset: \\(.+\\)")
+               (setq feedly-api-usage-reset (match-string 1)))
+           
+           (t
+            (let ((response (buffer-string)))
+              (pop-to-buffer "*feedly error*")
+              (erase-buffer)
+              (insert response)
+              (goto-char (point-min))
+              (signal (car err) (cdr err)))))
 
          (if post
              (funcall handler)
            
            (search-forward "\n\n")
            (set-buffer-multibyte t)
-           (funcall handler (json-read)))))
+           (let ((data (json-read)))
+             (kill-buffer)
+             (funcall handler data)))))
      
      (list handler postdata))))
 
 
 
 (defun feedly-fetch-batch-of-new-items (&optional continuation)
-  (print continuation)
   (unless continuation
     (setq feedly-new-items nil))
   (feedly-network-request
@@ -204,7 +221,10 @@
                        (insert (propertize "    " 'display `((height ,feedly-line-height))))
                        (setq item-start (point))
                        (insert (propertize
-                                (assoc-default 'title item)
+                                (replace-regexp-in-string
+                                 "\n" " "
+                                 (or (assoc-default 'title item)
+                                     "no title"))
                                 'face 'feedly-feed-item-face))
                        (put-text-property
                         (line-beginning-position)
@@ -305,6 +325,9 @@
     (if item
         (if (eq item feedly-last-selected-item)
             (browse-url (or (assoc-default 'canonicalUrl item)
+                            (let ((alternate (assoc-default 'alternate item)))
+                              (if alternate
+                                  (assoc-default 'href (aref alternate 0))))
                             (assoc-default 'originId item)))
           
           (setq feedly-last-selected-item item)
@@ -339,6 +362,7 @@
 
           (save-selected-window
             (pop-to-buffer "*feedly item*")
+            (use-local-map feedly-summary-map)
             (setq buffer-read-only t)
             (let ((inhibit-read-only t))
               (erase-buffer)
@@ -358,7 +382,8 @@
                 (insert
                  "\n"
                  (propertize
-                  (assoc-default 'title item)
+                  (or (assoc-default 'title item)
+                      "no title")
                   'face '(:height 1.3 :weight bold))
                  "\n\n")))))
 
