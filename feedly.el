@@ -129,14 +129,16 @@
               (goto-char (point-min))
               (signal (car err) (cdr err)))))
 
-         (if post
-             (funcall handler)
-           
-           (search-forward "\n\n")
-           (set-buffer-multibyte t)
-           (let ((data (json-read)))
-             (kill-buffer)
-             (funcall handler data)))))
+         (let ((buffer (current-buffer)))
+           (if post
+               (funcall handler)
+             
+             (search-forward "\n\n")
+             (set-buffer-multibyte t)
+             (let ((data (json-read)))
+               (funcall handler data)))
+
+           (kill-buffer buffer))))
      
      (list handler postdata))))
 
