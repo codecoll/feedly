@@ -236,11 +236,9 @@
                        (insert (propertize
                                 (format-time-string
                                  "(%Y-%m-%d %H:%M)"
-                                 (/
-                                  (if (assoc-default 'published item)
-                                      (assoc-default 'published item)
-                                      0)
-                                  1000))
+                                 (/ (or (assoc-default 'published item)
+                                        0)
+                                    1000))
                                 'face 'feedly-feed-item-time-face))
                        (insert "\n"))
                      (put-text-property
